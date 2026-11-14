@@ -1,0 +1,47 @@
+---
+/**
+ * A published-to-web Power BI report. It loads by itself when it scrolls near the viewport (lazy loading), with a subtle
+ * loading state. The iframe is the native report: filters, slicers, cross-highlighting and page navigation all work,
+ * with no Microsoft sign-in.
+ */
+interface Props { src: string; title: string }
+const { src, title } = Astro.props;
+---
+<section class="pbi" data-pbi aria-label={`Interactive dashboard: ${title}`}>
+  <div class="pbi-bar">
+    <h2 class="pbi-title" id={`pbi-${title.length}`}>Interactive dashboard</h2>
+    <div class="pbi-actions">
+      <button type="button" class="pbi-btn" data-pbi-full hidden>Full screen</button>
+      <a class="pbi-btn" href={src} target="_blank" rel="noopener noreferrer">Open in new tab<span class="sr-only"> (opens in a new tab)</span></a>
+    </div>
+  </div>
+  <div class="pbi-frame" data-pbi-frame data-src={src} data-title={title}>
+    <p class="pbi-loading" role="status">Loading the dashboard…</p>
+  </div>
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-pbi]').forEach((root) => {
+    const frame = root.querySelector<HTMLElement>('[data-pbi-frame]')!;
+    const loading = root.querySelector<HTMLElement>('.pbi-loading')!;
+    const full = root.querySelector<HTMLButtonElement>('[data-pbi-full]')!;
+    let iframe: HTMLIFrameElement | null = null;
+
+    const load = () => {
+      if (iframe) return;
+      iframe = document.createElement('iframe');
+      iframe.title = `${frame.dataset.title} (interactive Power BI report)`;
+      iframe.src = frame.dataset.src!;
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.addEventListener('load', () => { loading.hidden = true; iframe!.classList.add('is-ready'); });
+      frame.appendChild(iframe);
+      if (document.fullscreenEnabled) full.hidden = false;
+    };
+    // Lazy: start loading shortly before the report scrolls into view.
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) { io.disconnect(); load(); } }, { rootMargin: '400px 0px' });
+      io.observe(frame);
+    } else load();
+    full.addEventListener('click', () => { frame.requestFullscreen?.().catch(() => {}); });
+  });
+</script>

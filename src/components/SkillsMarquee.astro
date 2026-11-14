@@ -1,0 +1,36 @@
+---
+import { Image } from 'astro:assets';
+import { row1, row2 } from '../data/skills';
+---
+<section class="skills-section reveal" aria-labelledby="skills-title" data-marquees>
+  <div class="skills-head">
+    <h2 class="skills-heading" id="skills-title">My Skills Stack</h2>
+  </div>
+  {[{ list: row1, dir: 'go-left' }, { list: row2, dir: 'go-right' }].map(({ list, dir }) => (
+    <div class="marquee-outer">
+      <ul class={`marquee-track ${dir}`}>
+        {list.map((s) => (
+          <li class="skill-icon" title={s.name}>
+            <Image src={s.img} alt="" width={96} height={96} loading="lazy" />
+            <span>{s.name}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-marquees]').forEach((sec) => {
+    // One copy of each row is shipped. For the endless loop, JavaScript appends a second copy that is hidden from
+    // assistive technology and the tab order. Without JavaScript the tiles simply wrap in a grid.
+    sec.querySelectorAll<HTMLElement>('.marquee-track').forEach((track) => {
+      [...track.children].forEach((li) => {
+        const c = li.cloneNode(true) as HTMLElement;
+        c.setAttribute('aria-hidden', 'true');
+        c.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1'));
+        track.appendChild(c);
+      });
+      track.classList.add('is-looping');
+    });
+  });
+</script>

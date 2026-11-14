@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import VideoBand from '../components/VideoBand.astro';
+import Tile from '../components/Tile.astro';
+import HomeTimeline from '../components/HomeTimeline.astro';
+import SkillsMarquee from '../components/SkillsMarquee.astro';
+import WorkTogether from '../components/WorkTogether.astro';
+import star from '../assets/brand/star.svg';
+import union from '../assets/brand/union.svg';
+import { caseCovers, caseVideos } from '../data/covers';
+import { site } from '../data/site';
+
+const show = (d: { draft: boolean }) => import.meta.env.DEV ? true : !d.draft;
+const cases = (await getCollection('caseStudies', (c) => show(c.data))).filter((c) => !c.data.draft).sort((a, b) => a.data.order - b.data.order);
+const work = (await getCollection('work', (w) => show(w.data))).sort((a, b) => a.data.order - b.data.order);
+// Same cards, wording and numbering as the Projects page: Work Highlights 01 and 02, Projects 01 and 03.
+const featured = ['ad-hoc-analysis-consumer-goods', 'telangana-tourism-dashboard'].map((id) => ({ p: work.find((w) => w.id === id)!, n: work.findIndex((w) => w.id === id) + 1 })).filter((f) => f.p);
+
+const person = {
+  '@context': 'https://schema.org', '@type': 'Person', name: site.name, description: site.description,
+  url: Astro.site?.href, sameAs: Object.values(site.links),
+  alumniOf: [{ '@type': 'CollegeOrUniversity', name: 'Chandigarh University' }, { '@type': 'CollegeOrUniversity', name: 'Vrije Universiteit Brussel' }],
+  knowsAbout: ['Climate-risk analytics', 'Environmental data engineering', 'Decision-support systems', 'Parametric insurance'],
+};
+---
+<Base path="/" jsonLd={person}>
+  <section class="hero" aria-label="Introduction">
+    <div class="hero-inner">
+      <h1 class="hero-heading">
+        <span class="hero-line hero-line-1">Hi! <Image class="hero-star" src={star} alt="" width={120} loading="eager" /></span>
+        <span class="hero-line hero-line-2">I am Arnav</span>
+        <span class="hero-line hero-line-3">Patnaik</span>
+      </h1>
+      <div class="hero-right">
+        <p class="hero-desc">I work across product, data and strategy, turning <strong>complex problems into clear decisions and useful solutions.</strong></p>
+        <span class="scroll-hint" aria-hidden="true">Scroll for more</span>
+      </div>
+    </div>
+  </section>
+  <div class="hero-actions-wrap">
+    <div class="hero-actions">
+      <a class="btn" href="/projects">Explore my work</a>
+      <a class="btn btn--ghost" href={site.cv.href} data-track="cv_download">Download my CV</a>
+    </div>
+  </div>
+
+  <VideoBand />
+
+  <HomeTimeline />
+
+  <div class="section-head">
+    <p class="section-sub section-sub--above">Turning complex problems into useful products, insights and decisions.</p>
+    <h2 class="display" style="font-size:clamp(36px,6vw,96px);line-height:0.9;color:var(--blue)">Selected Work</h2>
+  </div>
+  <div class="all-projects-wrap home-projects">
+    <div class="all-projects-grid">
+      {cases.map((c, i) => <Tile all kind="case" n={`Work Highlight 0${i + 1}`} name={c.data.shortTitle} href={`/projects/${c.id}`} logo={caseCovers[c.id]?.logo} logoAlt={caseCovers[c.id]?.alt} video={caseVideos[c.id]?.card} context={c.data.cardLine ?? c.data.summary} />)}
+      {featured.map(({ p, n }) => (
+        <Tile all kind="project" n={`Project 0${n}`} name={p.data.cardTitle ?? p.data.title} href={`/projects/project/${p.id}`} video={`/media/projects/${n}`} coverAlt={`Screen recording of ${p.data.cardTitle ?? p.data.title}`} context={p.data.cardContext ?? p.data.context} award={p.data.cardAward ?? p.data.award} />
+      ))}
+    </div>
+  </div>
+
+  <div class="cta-wrap reveal">
+    <a href="/projects" class="cta-btn">View all projects</a>
+  </div>
+
+  <div class="bio-section">
+    <div class="bio-logo reveal"><Image src={union} alt="" width={110} /></div>
+    <div class="bio-text reveal reveal-delay-1">
+      <span class="bio-label">Mildly impressive moments</span>
+      <p class="bio-body">
+        Along the way, I've worked at the <strong>intersection of data, climate technology, and early-stage startups</strong>:
+        preparing 6.37 million arsenic screening records for groundwater-safety research in Bangladesh, reported with co-authors
+        at GSA Connects 2024 and 2025, and researching and wireframing a parametric insurance platform in India. Small milestones,
+        honest limits, and a constant curiosity for how data shapes decisions.
+      </p>
+      <a href="/about" class="bio-link">More about me
+        <svg viewBox="0 0 12 10" fill="none" aria-hidden="true"><path d="M1 5h10M7 1l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+  </div>
+
+  <SkillsMarquee />
+  <WorkTogether />
+</Base>

@@ -1,0 +1,50 @@
+---
+interface Props { open?: boolean }
+const { open = false } = Astro.props;
+---
+<section class="work-together reveal" aria-labelledby="wt-title" data-wt data-open={open ? 'true' : 'false'}>
+  <div class:list={['wt-card', { flipped: open }]}>
+    <button type="button" class="wt-face wt-front" aria-expanded={open ? 'true' : 'false'} inert={open}>
+      <span class="wt-text" id="wt-title">Let's work together</span>
+    </button>
+    <div class="wt-face wt-back" role="group" aria-label="Book a call" inert={!open}>
+      <button type="button" class="wt-close" aria-label="Close the booking calendar">&#x2715;</button>
+      <div class="wt-cal" data-src="https://calendly.com/patnaikarnav3?hide_gdpr_banner=1&primary_color=004cb6"></div>
+      <p class="wt-note">Booking is handled by Calendly, which loads only when you open this card. <a href="https://calendly.com/patnaikarnav3" target="_blank" rel="noopener noreferrer">Open it in a new tab<span class="sr-only"> (opens in a new tab)</span></a> or write to <a href="mailto:patnaikarnav3@gmail.com">patnaikarnav3@gmail.com</a>.</p>
+    </div>
+  </div>
+</section>
+<script>
+  // Flip card: a real button on the front, the Calendly scheduler on the back. The scheduler iframe is only created the
+  // first time the card is opened, so nothing is requested from Calendly until the visitor asks for it. The hidden face
+  // is `inert`; Escape closes. Without JavaScript the front shows and the email address elsewhere is the fallback.
+  document.querySelectorAll<HTMLElement>('[data-wt]').forEach((root) => {
+    const card = root.querySelector<HTMLElement>('.wt-card')!;
+    const front = root.querySelector<HTMLButtonElement>('.wt-front')!;
+    const back = root.querySelector<HTMLElement>('.wt-back')!;
+    const close = root.querySelector<HTMLButtonElement>('.wt-close')!;
+    const cal = root.querySelector<HTMLElement>('.wt-cal')!;
+
+    const load = () => {
+      if (cal.querySelector('iframe')) return;
+      const f = document.createElement('iframe');
+      f.src = cal.dataset.src!;
+      f.title = 'Book a call with Arnav Patnaik (Calendly)';
+      f.loading = 'lazy';
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      cal.appendChild(f);
+    };
+    const set = (flipped: boolean, focus = true) => {
+      card.classList.toggle('flipped', flipped);
+      front.toggleAttribute('inert', flipped);
+      back.toggleAttribute('inert', !flipped);
+      front.setAttribute('aria-expanded', String(flipped));
+      if (flipped) { load(); document.dispatchEvent(new CustomEvent('archive:track', { detail: 'booking_opened' })); }
+      if (focus) setTimeout(() => (flipped ? close : front).focus(), flipped ? 350 : 50);
+    };
+    set(root.dataset.open === 'true', false);
+    front.addEventListener('click', () => set(true));
+    close.addEventListener('click', () => set(false));
+    root.addEventListener('keydown', (e) => { if (e.key === 'Escape' && card.classList.contains('flipped')) set(false); });
+  });
+</script>

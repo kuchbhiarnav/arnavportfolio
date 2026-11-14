@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+<Base path="/privacy" title="Privacy" description="What this website does and does not collect: consent-gated analytics, the assistant, voice input and booking a call.">
+  <article class="plain">
+    <h1>What this site does with your data</h1>
+    <p class="meta">Last updated 14 November 2026. This is a plain-language description of how the site works, not legal advice.</p>
+    <h2>Who is responsible</h2>
+    <p>Arnav Patnaik, {site.location}. Contact: <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+
+    <h2>The short version</h2>
+    <ul>
+      <li>The pages are static and use fonts hosted on this site. No advertising trackers are used.</li>
+      <li>Analytics runs <strong>only if you accept it</strong>, and never receives what you type into the assistant or the booking calendar.</li>
+      <li>Booking a call uses <strong>Calendly</strong>, which is only loaded after you open the "Let's work together" card.</li>
+      <li>The assistant does not store your conversation on a server.</li>
+    </ul>
+
+    <h2 id="analytics">Analytics</h2>
+    <p>If you choose <em>Accept analytics</em>, the site loads Google Analytics 4 (measurement ID {site.analyticsId}). Google sets cookies and receives page-view data such as the page visited, approximate location, device and browser information. Advertising features and Google signals are switched off. If you choose <em>Decline</em>, nothing is loaded and no analytics cookie is set. You can change your choice at any time with the button below, which is also on this page. Declining later removes the analytics cookies this site can see.</p>
+    <p><button type="button" class="btn" data-open-consent>Change my analytics choice</button> You can withdraw or give consent here at any time; withdrawing is as easy as accepting.</p>
+    <p>Only event names such as "CV downloaded" are sent. Questions to the assistant, voice transcripts and contact messages are never sent to analytics.</p>
+
+    <h2>The assistant</h2>
+    <p>The assistant answers questions about this portfolio. It works in one of two modes.</p>
+    <ul>
+      <li><strong>Search mode (default).</strong> Your question is matched against the portfolio text in your browser. Nothing you type leaves your device.</li>
+      <li><strong>AI mode (only if the owner switches it on; at the time of this update it is off).</strong> Your question, up to the last six messages of this conversation and a few excerpts from the portfolio are sent to this site's server, which forwards them to Google's Gemini API (the only AI provider this site uses) to generate an answer. Nothing else from your browser, such as cookies or your IP address, is passed to Google; the server sends only the text of the conversation and the portfolio excerpts. This site does not store the content. For rate limiting, the server keeps counters under a salted, shortened hash of your IP address and a random per-tab session identifier, which expire within a day. Google processes the request under its own terms. This site uses Google's free Gemini API tier; Google states that on the free tier it may use submitted content to improve its products and that human reviewers may read it, so please do not type personal or confidential information into the assistant.</li>
+    </ul>
+    <p>Your conversation is kept in your browser tab's session storage so it survives page changes, and is removed when you close the tab or choose <em>Clear conversation</em>.</p>
+
+    <h2>Voice input and spoken answers</h2>
+    <p>The microphone is requested only when you press the microphone button. This site does not record or store audio. Speech recognition is provided by your browser, and depending on the browser it may send audio to the browser vendor's speech service, so it should not be assumed to be local or offline. Spoken answers use your browser's built-in speech synthesis. You can always type instead.</p>
+
+    <h2>Booking a call (Calendly) and email</h2>
+    <p>The "Let's work together" card shows my Calendly scheduling page. Nothing is requested from Calendly until you open the card. Once you do, Calendly (a third party) loads in the card and handles what you enter there, including your name, email address and chosen time, under its own <a href="https://calendly.com/privacy" target="_blank" rel="noopener noreferrer">privacy notice<span class="sr-only"> (opens in a new tab)</span></a>. This website receives none of it, and I see only the booking Calendly sends me. If you would rather not use Calendly, email me at <a href={`mailto:${site.email}`}>{site.email}</a>; email is handled by your provider and mine like any other email.</p>
+
+    <h2>Embedded dashboards (Microsoft Power BI)</h2>
+    <p>The Telangana Tourism and CodeX project pages show public Power BI reports. Nothing is requested from Microsoft until you press "Load the interactive dashboard". Once you do, the report loads from Microsoft (a third party), which can receive your IP address and set its own cookies under <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer">Microsoft's privacy statement<span class="sr-only"> (opens in a new tab)</span></a>. No sign-in is needed, and this website receives nothing from the report. You can avoid it by not pressing the button, or by opening the code and data on GitHub instead.</p>
+
+    <h2>Stored in your browser</h2>
+    <ul>
+      <li><code>archive:analytics-consent</code>: your analytics choice (local storage).</li>
+      <li><code>archive:assistant</code>: the current assistant conversation (session storage).</li>
+    </ul>
+
+    <h2>Other websites</h2>
+    <p>Links to GitHub, LinkedIn, ResearchGate, conference sites and Microsoft Fabric dashboards lead to services with their own privacy practices.</p>
+
+    <h2>Your rights</h2>
+    <p>You can ask what personal data I hold about you, and ask for it to be corrected or deleted, by emailing <a href={`mailto:${site.email}`}>{site.email}</a>. If you are in the EU you can also complain to your data protection authority; in Belgium that is the Data Protection Authority (APD/GBA).</p>
+
+    <h2>Changes</h2>
+    <p>If the way the site handles data changes, for example if AI mode is switched on, this page is updated first and the date above changes.</p>
+    </article>
+</Base>

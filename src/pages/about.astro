@@ -1,0 +1,145 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import WorkTogether from '../components/WorkTogether.astro';
+import star from '../assets/brand/bio-star.svg';
+import portrait from '../assets/brand/about-portrait.webp';
+import certBg from '../assets/brand/certificates-bg.webp';
+import degree from '../assets/certificates/degree-original.jpg';
+import msBadge from '../assets/certificates/ms-associate-badge.svg';
+import sqlCert from '../assets/certificates/codebasics-sql.jpg';
+import excelCert from '../assets/certificates/udemy-excel.jpg';
+import marketingCert from '../assets/certificates/udemy-digital-marketing.jpg';
+import { education, roles } from '../data/experience';
+import { rangeNumeric } from '../lib/knowledge';
+import { site } from '../data/site';
+
+const person = { '@context': 'https://schema.org', '@type': 'Person', name: site.name, description: site.description, sameAs: Object.values(site.links) };
+const certs = [
+  { title: 'Microsoft Certified: Power BI Data Analyst Associate', from: 'Microsoft Learn', href: 'https://learn.microsoft.com/en-us/users/arnavpatnaik-4385/credentials/d8b2c5b50305de66?ref=https%3A%2F%2Fwww.linkedin.com%2F', img: msBadge, badge: true },
+  { title: 'SQL Beginner to Advanced for Data Professionals', from: 'Codebasics', href: 'https://codebasics.io/certificate/CB-50-24471', img: sqlCert },
+  { title: 'Microsoft Excel: Excel from Beginner to Advanced', from: 'Udemy', href: 'https://www.udemy.com/certificate/UC-9b97ea38-7ea5-4d27-9681-24ab6e75de91/', img: excelCert },
+  { title: 'The Complete Digital Marketing Guide: 27 Courses in 1', from: 'Udemy', href: 'https://www.udemy.com/certificate/UC-b113494e-7793-4c8c-935c-963986901ce4/', img: marketingCert },
+];
+---
+<Base path="/about" title="About" blueNav description="Arnav Patnaik: from computer science and AI/ML to groundwater research and parametric insurance product work, now studying management in Brussels." jsonLd={person}>
+  <section class="about-hero" aria-labelledby="about-title">
+    <div class="about-hero-inner">
+      <h1 class="about-hero-title" id="about-title">About</h1>
+      <div class="hero-portrait" aria-hidden="true">
+        <Image src={portrait} width={1000} height={1200} widths={[540, 800, 1000]} sizes="(max-width: 768px) 45vw, 32vw" alt="" loading="eager" fetchpriority="high" />
+      </div>
+    </div>
+  </section>
+
+  <section class="bio-panel" aria-label="Biography">
+    <div class="bio-panel-inner">
+      <div class="bio-main">
+        <p>I work at the intersection of data, strategy, and real-world impact. My path runs from a computer science and AI/ML foundation, through applied analytics and environmental research, to climate-tech and insurance product work, with management studies now broadening the business side. Each layer builds on the one before; none replaces it.</p>
+        <p>Outside of work, I'm constantly exploring the world that data tries to explain. I love to travel, practice street photography to sharpen my creative edge, and cook while learning new languages to better understand the places I visit. These experiences shape how I see systems, patterns, and people.</p>
+        <p>I value clarity, context, and work that connects deeply with the world it aims to serve.</p>
+      </div>
+      <div class="bio-sidebar">
+        <div class="bio-sidebar-col">
+          <h2>Areas of Focus</h2>
+          <ul>
+            <li>Data &amp; Analytics Solutions</li>
+            <li>ML &amp; Predictive Modeling</li>
+            <li>Market &amp; Ecosystem Research</li>
+            <li>Investor Pitch Decks</li>
+            <li>UI/UX Design &amp;<br />Interactive Prototyping</li>
+          </ul>
+        </div>
+        <div class="bio-sidebar-col">
+          <h2>Contact</h2>
+          <ul>
+            <li><a href={`mailto:${site.email}`}>email</a></li>
+            <li><a href={site.links.linkedin} target="_blank" rel="noopener noreferrer">linkedin<span class="sr-only"> (opens in a new tab)</span></a></li>
+            <li><a href={site.links.github} target="_blank" rel="noopener noreferrer">github<span class="sr-only"> (opens in a new tab)</span></a></li>
+            <li><a href={site.links.researchgate} target="_blank" rel="noopener noreferrer">researchgate<span class="sr-only"> (opens in a new tab)</span></a></li>
+            <li><a href={site.cv.href} target="_blank" rel="noopener noreferrer" data-track="cv_download">resume<span class="sr-only"> (PDF, opens in a new tab)</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="bio-star" aria-hidden="true"><Image class="bio-star-svg" src={star} alt="" width={80} /></div>
+  </section>
+
+  <section class="experience-section" id="education" aria-labelledby="edu-title">
+    <div class="experience-inner">
+      <h2 class="section-heading" id="edu-title">Education</h2>
+      <div class="exp-table" role="table" aria-label="Education">
+        <div class="exp-header" role="row"><span class="col-company" role="columnheader">Institution</span><span class="col-role" role="columnheader">Degree</span><span class="col-dur" role="columnheader">Duration</span></div>
+        {[...education].sort((a, b) => (a.start < b.start ? -1 : 1)).map((e) => (
+          <div class="exp-row" role="row" data-edu={e.id === 'cu' ? 'cu' : undefined}>
+            <span class="col-company" role="cell">{e.school}</span>
+            <span class="col-role" role="cell">
+              {e.id === 'cu' ? 'B.E. Computer Science & Engineering (Hons.), AI & ML, with IBM' : e.degree}
+              {e.detail && <small>{e.detail}</small>}
+            </span>
+            <span class="col-dur" role="cell">{rangeNumeric(e.start, e.end)}</span>
+          </div>
+        ))}
+      </div>
+      <div class="edu-preview" id="edu-preview" aria-hidden="true"><Image src={degree} alt="" width={520} loading="lazy" /></div>
+    </div>
+  </section>
+
+  <section class="experience-section" id="experience" aria-labelledby="exp-title" style="padding-top:0">
+    <div class="experience-inner">
+      <h2 class="section-heading" id="exp-title">Experience</h2>
+      <div class="exp-table" role="table" aria-label="Experience">
+        <div class="exp-header" role="row"><span class="col-company" role="columnheader">Company</span><span class="col-role" role="columnheader">Role</span><span class="col-dur" role="columnheader">Duration</span></div>
+        {roles.map((r) => (
+          <div class="exp-row" role="row" id={r.id}>
+            <span class="col-company" role="cell">{r.org}</span>
+            <span class="col-role" role="cell">
+              {r.title}
+            </span>
+            <span class="col-dur" role="cell">{rangeNumeric(r.start, r.end)}</span>
+          </div>
+        ))}
+      </div>
+      <p class="note">Roles at DigiSafe and Plutas.ai overlapped from September 2024 to April 2025.</p>
+    </div>
+  </section>
+
+  <section class="certs-section" aria-labelledby="certs-title">
+    <h2 class="certs-heading" id="certs-title">My Certifications</h2>
+    <div class="certs-bg-wrap" data-certs>
+      <Image class="certs-bg-img" src={certBg} alt="" width={1600} loading="lazy" />
+      <div class="certs-marquee-outer">
+        <ul class="certs-marquee-track">
+          {certs.map((c) => (
+            <li>
+              <a class:list={['cert-card', c.badge && 'cert-card--badge']} href={c.href} target="_blank" rel="noopener noreferrer">
+                <Image src={c.img} alt={`${c.title}, ${c.from}`} width={c.badge ? 160 : 760} loading="lazy" />
+                {c.badge && <span class="cert-title">{c.title}</span>}
+                <span class="sr-only">View the certificate on {c.from} (opens in a new tab)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <WorkTogether />
+
+  <script>
+    // Hover preview of the degree follows the pointer.
+    const row = document.querySelector<HTMLElement>('[data-edu="cu"]');
+    const pv = document.getElementById('edu-preview');
+    if (row && pv && matchMedia('(hover: hover)').matches) {
+      row.addEventListener('mousemove', (e) => { pv.classList.add('show'); pv.style.left = Math.min(e.clientX + 18, innerWidth - 380) + 'px'; pv.style.top = Math.min(e.clientY + 18, innerHeight - 290) + 'px'; });
+      row.addEventListener('mouseleave', () => pv.classList.remove('show'));
+    }
+    const wrap = document.querySelector<HTMLElement>('[data-certs]');
+    // Endless loop: append a copy that assistive technology and the tab order skip.
+    const track = wrap?.querySelector<HTMLElement>('.certs-marquee-track');
+    if (track) {
+      [...track.children].forEach((li) => { const c = li.cloneNode(true) as HTMLElement; c.setAttribute('aria-hidden', 'true'); c.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1')); track.appendChild(c); });
+      track.classList.add('is-looping');
+    }
+  </script>
+</Base>

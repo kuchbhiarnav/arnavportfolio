@@ -1,0 +1,97 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
+import Assistant from '../assistant/Assistant';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Site-relative path, used for canonical URL and the nav's current-page state. */
+  path: string;
+  ogType?: 'website' | 'article';
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+  /** Blue navigation bar (About, Work) or the white one (everywhere else), as on the original site. */
+  blueNav?: boolean;
+}
+const { title, description = site.description, path, ogType = 'website', jsonLd, noindex = false, blueNav = false } = Astro.props;
+const fullTitle = title ? `${title} · ${site.title}` : site.title;
+// Absolute URLs only exist when a real origin is configured (SITE_URL). We never guess a domain.
+const abs = (p: string) => (Astro.site ? new URL(p, Astro.site).href : undefined);
+const canonical = abs(path === '/' ? '/' : path);
+const ogImage = abs('/og/default.jpg');
+const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#004cb6" />
+
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content="en" />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && <meta property="og:image:width" content="1200" />}
+    {ogImage && <meta property="og:image:height" content="630" />}
+    {ogImage && <meta property="og:image:alt" content="Arnav's Journal: earth, tech, data" />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav current={path} blue={blueNav} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <ConsentBanner />
+    <Assistant client:idle />
+    <script>
+      // Shadow under the nav once the page scrolls; hamburger is a real disclosure button.
+      const nav = document.getElementById('navbar');
+      const onScroll = () => nav?.classList.toggle('scrolled', window.scrollY > 20);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      const burger = document.getElementById('hamburger');
+      const menu = document.getElementById('mobileMenu');
+      const setMenu = (open: boolean) => { burger?.setAttribute('aria-expanded', String(open)); menu?.classList.toggle('open', open); };
+      burger?.addEventListener('click', () => setMenu(burger.getAttribute('aria-expanded') !== 'true'));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && burger?.getAttribute('aria-expanded') === 'true') { setMenu(false); burger.focus(); } });
+
+      // Scroll reveal (content is fully visible without JavaScript or with reduced motion).
+      const els = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const io = new IntersectionObserver((entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('visible'); io.unobserve(en.target); } }), { threshold: 0.08 });
+        els.forEach((el) => io.observe(el));
+      } else els.forEach((el) => el.classList.add('visible'));
+
+      // Native <dialog>: focus is trapped and restored by the browser; we add backdrop-click and button wiring.
+      document.querySelectorAll<HTMLElement>('[data-dialog-open]').forEach((b) =>
+        b.addEventListener('click', () => (document.getElementById(b.dataset.dialogOpen!) as HTMLDialogElement | null)?.showModal()),
+      );
+      document.querySelectorAll<HTMLDialogElement>('dialog').forEach((d) => {
+        d.querySelectorAll('[data-dialog-close]').forEach((c) => c.addEventListener('click', () => d.close()));
+        d.addEventListener('click', (e) => { if (e.target === d) d.close(); });
+      });
+    </script>
+  </body>
+</html>

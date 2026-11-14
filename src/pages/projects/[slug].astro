@@ -1,0 +1,161 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Recent from '../../components/Recent.astro';
+import ThresholdExplainer from '../../components/ThresholdExplainer';
+import { site } from '../../data/site';
+import { caseVideos } from '../../data/covers';
+const video = caseVideos[Astro.props.entry.id];
+import { Image } from 'astro:assets';
+import { toolIcons, iconFor, initials } from '../../data/toolIcons';
+const icons = toolIcons;
+
+export async function getStaticPaths() {
+  const all = await getCollection('caseStudies', (c) => import.meta.env.DEV || !c.data.draft);
+  return all.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+
+const tools = d.tools.filter((t) => icons.has(t));
+const hasTools = tools.length > 0 || d.toolGroups.length > 0;
+const paras = (t: string) => t.split(/\n\n+/);
+const labelled = (t: string) => { const i = t.indexOf(': '); return i > 0 && i < 48 ? [t.slice(0, i), t.slice(i + 2)] as const : null; };
+const sections = [
+  { id: 'problem', title: 'Problem and intended decision', show: true },
+  { id: 'data', title: 'Constraints and available data', show: d.constraints.length + d.data.length > 0 },
+  { id: 'contribution', title: 'My contribution', show: d.contribution.length > 0 },
+  { id: 'approach', title: 'Approach and tradeoffs', show: d.approach.length + d.tradeoffs.length > 0 },
+  { id: 'explainer', title: 'Why the threshold matters', show: entry.id === 'groundwater-arsenic-decision-support' },
+  { id: 'outputs', title: 'Outputs and evidence', show: d.outputs.length + d.outputNotes.length > 0 },
+  { id: 'outcomes', title: 'Outcomes, with measurement context', show: d.outcomes.length > 0 },
+  { id: 'limitations', title: 'Limitations and learning', show: d.showLimitations && d.limitations.length > 0 },
+  { id: 'tools', title: 'Tools', show: hasTools },
+].filter((s) => s.show);
+
+const abs = (p: string) => (Astro.site ? new URL(p, Astro.site).href : undefined);
+const article = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: d.title, description: d.summary,
+  author: { '@type': 'Person', name: site.name },
+  dateModified: d.updated, // the page's review date, never an invented publication date
+  url: abs(`/projects/${entry.id}`),
+};
+const ext = (u: string) => u.startsWith('http');
+---
+<Base path={`/projects/${entry.id}`} title={d.shortTitle} description={d.summary} ogType="article" jsonLd={article}>
+  <header class="article-detail-header">
+    {d.draft && <p class="note"><strong>Draft, not published.</strong> {d.blockedBy}</p>}
+    <div class="article-detail-meta"><span>Work Highlight</span><span aria-hidden="true">·</span><span>{d.role}</span></div>
+    <h1 class="article-detail-title">{d.title}</h1>
+    <p class="article-detail-sub">{d.summary}</p>
+  </header>
+  {video && <div class="article-detail-hero project-video-hero"><video src={video.page} poster={video.poster} autoplay muted loop playsinline controls controlslist="nodownload" preload="metadata" aria-label={`${video.label}. Muted by default; use the video controls to unmute.`}></video></div>}
+
+  <div class="article-content">
+    <div class="article-byline-meta">
+      <dl style="display:contents">
+        <div class="byline-item"><dt class="byline-label">Organisation</dt><dd class="byline-value">{d.org}</dd></div>
+        <div class="byline-item"><dt class="byline-label">Period</dt><dd class="byline-value">{d.period}</dd></div>
+        <div class="byline-item"><dt class="byline-label">My role</dt><dd class="byline-value">{d.role}</dd></div>
+        {d.ecosystem && <div class="byline-item"><dt class="byline-label">Product ecosystem</dt><dd class="byline-value" style="font-size:17px">{d.ecosystem}</dd></div>}
+        {d.areas.length > 0 && <div class="byline-item"><dt class="byline-label">Areas of contribution</dt><dd class="byline-value" style="font-size:17px">{d.areas.join(' · ')}</dd></div>}
+      </dl>
+      <nav class="toc" aria-label="On this page"><ol>{sections.map((s) => <li><a href={`#${s.id}`}>{s.title}</a></li>)}</ol></nav>
+    </div>
+
+    <article class="article-body">
+      <div style="font-family:var(--font-read);font-size:21px;line-height:1.5"><Content /></div>
+
+      <section class="cs-section" id="problem" aria-labelledby="problem-h">
+        <h2 id="problem-h">Problem and intended decision</h2>
+        {paras(d.problem).map((x) => <p>{x}</p>)}
+        <p class="callout"><strong>The decision this was meant to support:</strong> {d.intendedDecision}</p>
+      </section>
+
+      {(d.constraints.length > 0 || d.data.length > 0) && (
+        <section class="cs-section" id="data" aria-labelledby="data-h">
+          <h2 id="data-h">Constraints and available data</h2>
+          {d.data.length > 0 && <><h3>Data</h3><ul>{d.data.map((x) => <li>{x}</li>)}</ul></>}
+          {d.constraints.length > 0 && <><h3>Constraints</h3><ul>{d.constraints.map((x) => <li>{x}</li>)}</ul></>}
+        </section>
+      )}
+
+      <section class="cs-section" id="contribution" aria-labelledby="contribution-h">
+        <h2 id="contribution-h">My contribution</h2>
+        {d.contributionGroups.length > 0
+          ? d.contributionGroups.map((g, i) => (
+              <>
+                <h3>{i + 1}. {g.title}</h3>
+                <ul>{g.items.map((x) => <li>{x}</li>)}</ul>
+                {g.subTitle && <><p><strong>{g.subTitle}</strong></p><ul>{g.subItems.map((x) => <li>{x}</li>)}</ul></>}
+              </>
+            ))
+          : <ul>{d.contribution.map((x) => <li>{x}</li>)}</ul>}
+      </section>
+
+      {(d.approach.length > 0 || d.tradeoffs.length > 0) && (
+        <section class="cs-section" id="approach" aria-labelledby="approach-h">
+          <h2 id="approach-h">Approach and tradeoffs</h2>
+          {d.approach.length > 0 && <ul>{d.approach.map((x) => { const l = labelled(x); return <li>{l ? <><strong>{l[0]}:</strong> {l[1]}</> : x}</li>; })}</ul>}
+          {d.tradeoffs.length > 0 && <><h3>Tradeoffs</h3><ul>{d.tradeoffs.map((x) => <li>{x}</li>)}</ul></>}
+        </section>
+      )}
+
+      {entry.id === 'groundwater-arsenic-decision-support' && (
+        <section class="cs-section" id="explainer" aria-labelledby="explainer-h">
+          <h2 id="explainer-h">Why the threshold matters</h2>
+          <ThresholdExplainer client:visible />
+        </section>
+      )}
+
+      {d.outputs.length + d.outputNotes.length > 0 && (
+        <section class="cs-section" id="outputs" aria-labelledby="outputs-h">
+          <h2 id="outputs-h">Outputs and evidence</h2>
+          {d.outputsIntro && <p>{d.outputsIntro}</p>}
+          <ul>
+            {d.outputNotes.map((x) => { const l = labelled(x); return <li>{l ? <><strong>{l[0]}:</strong> {l[1]}</> : x}</li>; })}
+            {d.outputs.map((o) => <li><a href={o.url} target={ext(o.url) ? '_blank' : undefined} rel={ext(o.url) ? 'noopener noreferrer' : undefined}>{o.label}{ext(o.url) && <span class="sr-only"> (opens in a new tab)</span>}</a></li>)}
+          </ul>
+        </section>
+      )}
+
+      {d.outcomes.length > 0 && (
+        <section class="cs-section" id="outcomes" aria-labelledby="outcomes-h">
+          <h2 id="outcomes-h">Outcomes, with measurement context</h2>
+          {d.outcomes.length > 1 ? d.outcomes.map((x) => <p>{x}</p>) : <ul>{d.outcomes.map((x) => <li>{x}</li>)}</ul>}
+          {d.outcomesFollow.map((x) => <p>{x}</p>)}
+          {d.outcomeContext && <p class="callout"><strong>What this does and does not show.</strong> {d.outcomeContext}</p>}
+        </section>
+      )}
+
+      {d.showLimitations && d.limitations.length > 0 && (
+        <section class="cs-section" id="limitations" aria-labelledby="limitations-h">
+          <h2 id="limitations-h">Limitations and learning</h2>
+          <ul>{d.limitations.map((x) => <li>{x}</li>)}</ul>
+        </section>
+      )}
+
+      {hasTools && (
+        <section class="cs-section" id="tools" aria-labelledby="tools-h">
+          <h2 id="tools-h">Tools</h2>
+          {d.toolGroups.length > 0
+            ? d.toolGroups.map((g) => (
+                <>
+                  <h3>{g.title}</h3>
+                  <ul class="tool-icons">{g.items.map((t) => <li>{iconFor(t) ? <Image src={iconFor(t)!} alt="" width={56} height={56} loading="lazy" /> : <span class="tool-dot" aria-hidden="true">{initials(t)}</span>}<span>{t}</span></li>)}</ul>
+                </>
+              ))
+            : <ul class="tool-icons">{tools.map((t) => <li><Image src={icons.get(t)!} alt="" width={56} height={56} loading="lazy" /><span>{t}</span></li>)}</ul>}
+        </section>
+      )}
+
+    </article>
+  </div>
+
+  <Recent exclude={`/projects/${entry.id}`} />
+  <script>
+    // Reduced motion: keep the first frame instead of autoplaying; the controls start it.
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector<HTMLVideoElement>('.project-video-hero video')?.pause();
+  </script>
+</Base>

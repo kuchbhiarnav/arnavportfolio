@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+<Base path="/terms" title="Terms of use" description="Terms for using Arnav's Archive, including the assistant, third-party work and links.">
+  <article class="plain">
+    <h1>Using this site</h1>
+    <p class="meta">Last updated 7 November 2026.</p>
+    <h2>What this site is</h2>
+    <p>A personal portfolio of Arnav Patnaik's work, research and experience, provided for information. Nothing here is professional, financial, insurance, environmental or legal advice.</p>
+    <h2>Accuracy</h2>
+    <p>I aim to describe work accurately, including its limits. Results on a project page are what the cited source reports and are not guarantees of outcomes elsewhere. Research listed here has co-authors; author order and presentation details follow the linked conference pages, which are the authoritative record.</p>
+    <h2>The assistant</h2>
+    <p>The assistant is an automated guide to this portfolio. It can be wrong or incomplete, it cannot book meetings or send messages, and its answers are not statements made by me. Check important facts against the linked pages or by email. Please do not enter confidential or sensitive personal information into it.</p>
+    <h2>Content and ownership</h2>
+    <p>The text and design of this site belong to Arnav Patnaik. Research abstracts, datasets, employers' materials and third-party logos or certificates belong to their authors, organisations or issuers. You may link to any page. Please do not republish content without permission.</p>
+    <h2>Links to other sites</h2>
+    <p>External sites are outside my control and I am not responsible for their content or availability.</p>
+    <h2>Fair use of the assistant</h2>
+    <p>Automated or abusive use of the assistant may be rate-limited or blocked to keep the site available.</p>
+    <h2>Liability</h2>
+    <p>The site is provided as is. To the extent the law allows, I am not liable for losses arising from using it or relying on it.</p>
+    <h2>Contact</h2>
+    <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+    </article>
+</Base>

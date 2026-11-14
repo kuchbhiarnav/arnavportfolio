@@ -1,0 +1,14 @@
+# Copy to .dev.vars for local development. NEVER commit .dev.vars.
+# AI stays off unless you opt in. With AI_ENABLED=false the site uses local search + FAQs (zero API cost).
+AI_ENABLED=false
+# Google AI Studio key (server side only; never exposed to the browser).
+GEMINI_API_KEY=
+RATE_SALT=change-me-to-a-long-random-string
+# Ordered model pool. Each model has its own daily and per-minute cap in src/lib/models.ts, kept below Google's free-tier quota.
+GEMINI_MODELS=gemini-3.5-flash-lite,gemini-3.1-flash-lite
+# Visitor and site-wide caps on top of the per-model caps.
+AI_GLOBAL_DAILY_LIMIT=800
+AI_CLIENT_DAILY_LIMIT=20
+AI_CLIENT_PER_MINUTE=3
+AI_GLOBAL_PER_MINUTE=20
+# Free-tier note: Google's terms for the free Gemini tier restrict serving users in the EEA, Switzerland and the UK, and free-tier content may be used to improve Google products. Check before enabling this on a public site.

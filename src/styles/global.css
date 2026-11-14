@@ -1,0 +1,13 @@
+/* Self-hosted fonts: no request to Google Fonts. */
+@import '@fontsource-variable/bricolage-grotesque/wdth.css';
+@import '@fontsource/archivo-narrow/400.css';
+@import '@fontsource/archivo-narrow/500.css';
+@import '@fontsource/archivo-narrow/600.css';
+@import '@fontsource/archivo-narrow/700.css';
+@import '@fontsource/lisu-bosa/200.css';
+@import '@fontsource-variable/radio-canada-big/wght.css';
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource/geist-mono/400.css';
+@import '@fontsource-variable/inter/wght.css';
+@import './site.css';
+@import './widgets.css';

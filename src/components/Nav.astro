@@ -1,0 +1,27 @@
+---
+import { Image } from 'astro:assets';
+import blue from '../assets/brand/logo-blue.png';
+import white from '../assets/brand/logo-white.png';
+interface Props { current: string; blue?: boolean }
+const { current, blue: isBlue = false } = Astro.props;
+const items = [
+  { href: '/about', label: 'About' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/research', label: 'Insights' },
+];
+const isCurrent = (href: string) => current === href || current.startsWith(href + '/');
+---
+<header class:list={['nav', { 'nav--blue': isBlue }]} id="navbar">
+  <a class="nav-logo" href="/" aria-label="Arnav's Archive, home">
+    <Image src={isBlue ? white : blue} alt="" width={320} densities={[1, 2]} loading="eager" />
+  </a>
+  <nav class="nav-links" aria-label="Main">
+    {items.map((i) => <a class="nav-btn" href={i.href} aria-current={isCurrent(i.href) ? 'page' : undefined}>{i.label}</a>)}
+  </nav>
+  <button class="hamburger" id="hamburger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<nav class="nav-mobile-menu" id="mobileMenu" aria-label="Main (mobile)">
+  {items.map((i) => <a class="nav-btn" href={i.href} aria-current={isCurrent(i.href) ? 'page' : undefined}>{i.label}</a>)}
+</nav>

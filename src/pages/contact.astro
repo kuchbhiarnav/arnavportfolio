@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import WorkTogether from '../components/WorkTogether.astro';
+import { site } from '../data/site';
+---
+<Base path="/contact" title="Contact" description="Get in touch with Arnav Patnaik about research collaborations, roles and projects in climate, data and insurance.">
+  <div class="contact-wrap">
+    <h1>Contact</h1>
+    <div class="contact-list">
+      <h2>Email</h2>
+      <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+      <h2>Based in</h2>
+      <p>{site.location}</p>
+    </div>
+    <div class="contact-list">
+      <h2>Elsewhere</h2>
+      <p><a href={site.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></p>
+      <p><a href={site.links.github} target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> (opens in a new tab)</span></a></p>
+      <p><a href={site.links.researchgate} target="_blank" rel="noopener noreferrer">ResearchGate<span class="sr-only"> (opens in a new tab)</span></a></p>
+    </div>
+    <p class="note" style="grid-column:1/-1">Email is the quickest route. The form below opens your own email app with your message filled in: nothing is sent by this website, and nothing you type is stored or sent to analytics.</p>
+  </div>
+  <WorkTogether open />
+</Base>

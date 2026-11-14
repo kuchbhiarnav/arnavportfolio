@@ -1,0 +1,16 @@
+---
+---
+<div class="video-band reveal">
+  <video id="intro-video" src="/media/intro.mp4" poster="/media/intro-poster.webp" muted playsinline preload="none" controls controlslist="nodownload"
+    disablepictureinpicture aria-label="Beyond the Obvious, a personal documentary by Arnav Patnaik, about two minutes. It starts muted; use the sound button to hear the narration. Captions are in the picture."></video>
+</div>
+<script>
+  // The film loads only when it scrolls near the viewport and starts muted (browsers require that), never by itself for visitors who
+  // ask for less motion. Standard video controls give pause, volume and fullscreen (WCAG 2.2.2). The narration is captioned in the picture.
+  const v = document.getElementById('intro-video') as HTMLVideoElement | null;
+  if (v && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    new IntersectionObserver((entries, obs) => {
+      if (entries.some((e) => e.isIntersecting)) { v.preload = 'auto'; void v.play().catch(() => {}); obs.disconnect(); }
+    }, { rootMargin: '200px' }).observe(v);
+  }
+</script>

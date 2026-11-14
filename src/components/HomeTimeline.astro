@@ -1,0 +1,99 @@
+---
+// "The Journey So Far": one continuous blue path through six chapters, rising left to right on wide
+// screens and running down a single line on narrow ones. Every chapter is one link. The page reads
+// completely with JavaScript off; the animation is only added on top (and skipped for reduced motion).
+const steps = [
+  { id: 'cu', x: 8.4, y: 62.7, date: '2020 to 2024', kind: 'Education', head: 'Chandigarh University', role: 'B.E. Computer Science & Engineering (Hons.), AI & ML, with IBM', body: '', href: '/about#education', cta: 'Explore education' },
+  { id: 'feynn', x: 23.7, y: 57.3, date: 'May to Jul 2022', kind: 'Experience', head: 'Feynn Labs', role: 'Machine Learning Intern', body: 'Air-quality data pipelines and EV market segmentation.', href: '/about#experience', cta: 'Explore experience' },
+  { id: 'exceldots', x: 41.1, y: 50.8, date: 'Jan to Jun 2024', kind: 'Experience', head: 'Exceldots AB', role: 'Data Analyst Intern (Remote, India)', body: 'Data pipelines, 6.37 million arsenic screening records and decision-support dashboards.', href: '/projects/groundwater-arsenic-decision-support', cta: 'Explore the groundwater case study' },
+  { id: 'digisafe', x: 55.7, y: 43.7, date: 'Aug 2024 to Apr 2025', kind: 'Experience', head: 'DigiSafe Insurance Broking', role: 'Data Consultant', body: 'Climate data pipelines, insurance product UX and distribution strategy.', href: '/about#digisafe', cta: 'Explore experience', overlap: true },
+  { id: 'plutas', x: 71.9, y: 36.0, date: 'Sep 2024 to present', kind: 'Experience', head: 'Plutas.ai', role: "Program Manager (Founder's Office)", body: 'Product strategy, market and regulatory research, wireframing and investor materials.', href: '/projects/parametric-insurance-plutas-insure', cta: 'Explore Plutas Insure', live: true },
+  { id: 'vub', x: 88.3, y: 25.8, date: 'Sep 2026 to present', kind: 'Education', head: 'Vrije Universiteit Brussel', role: "Master's in Management", body: '', href: '/about#education', cta: 'Explore education', live: true },
+];
+
+// Smooth cubic path through the nodes (Catmull-Rom converted to Bezier), in a 1670 x 1000 frame.
+const W = 1670, H = 860;
+const up = (y: number) => y - 6; // lift the whole path so the stage has no empty band above it
+const pts = [[1.8, 65.8], ...steps.map((s) => [s.x, s.y]), [98.2, 19.7]].map(([x, y]) => [x!, up(y!)]).map(([x, y]) => [(x! / 100) * W, (y! / 100) * H] as const);
+let d = `M${pts[0]![0].toFixed(1)} ${pts[0]![1].toFixed(1)}`;
+for (let i = 0; i < pts.length - 1; i++) {
+  const p0 = pts[Math.max(i - 1, 0)]!, p1 = pts[i]!, p2 = pts[i + 1]!, p3 = pts[Math.min(i + 2, pts.length - 1)]!;
+  const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+  d += ` C${c1[0]!.toFixed(1)} ${c1[1]!.toFixed(1)} ${c2[0]!.toFixed(1)} ${c2[1]!.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+}
+const last = pts[pts.length - 1]!, prev = pts[pts.length - 2]!;
+const ang = Math.atan2(last[1] - prev[1], last[0] - prev[0]);
+const arrow = (a: number) => `M${(last[0] - 26 * Math.cos(ang - a)).toFixed(1)} ${(last[1] - 26 * Math.sin(ang - a)).toFixed(1)}L${last[0].toFixed(1)} ${last[1].toFixed(1)}`;
+const arrowD = `${arrow(0.5)}${arrow(-0.5)}`;
+
+// Small monochrome line illustrations, one per chapter (decorative).
+const art: Record<string, string> = {
+  cu: '<rect class="bg" x="12" y="8" width="72" height="72"/><path d="M12 106h96M24 106V56h72v50M24 56l36-16 36 16M38 68v8m16-8v8m16-8v8m16-8v8M38 86v8m16-8v8m16-8v8m16-8v8M54 106V98h12v8"/>',
+  feynn: '<rect class="bg" x="40" y="12" width="66" height="60"/><path d="M20 98h80l-9-10H29zM32 88V50a4 4 0 014-4h48a4 4 0 014 4v38M42 58h22M42 66h36M42 74h16"/>',
+  exceldots: '<rect class="bg" x="58" y="10" width="50" height="56"/><path d="M42 38h36l4 16H38zM44 54v10h32V54M48 64l-8 40M72 64l8 40M44 86h32M36 104h48M14 112q11-7 22 0t22 0t22 0t22 0"/>',
+  digisafe: '<rect class="bg" x="14" y="10" width="52" height="52"/><path d="M12 108h96M64 108V48M64 48V12M64 48l28 15M64 48L38 63M20 92q-8-18 8-18q4-14 20-6q10-8 18 6"/><circle cx="64" cy="48" r="4"/>',
+  plutas: '<rect class="bg" x="52" y="8" width="56" height="56"/><rect x="18" y="34" width="84" height="62" rx="5"/><path d="M18 48h84M30 60h32v26H30zM72 60h20M72 70h20M72 80h12"/>',
+  vub: '<rect class="bg" x="50" y="6" width="56" height="52"/><path d="M12 108h96M40 108V56l20-40 20 40v52M50 108V86a10 10 0 0120 0v22M52 62h16M52 72h16M14 108V82h26M80 82h26v26"/>',
+};
+---
+<section class="htl" aria-labelledby="htl-title" data-htl>
+  <div class="htl-head-block">
+    <p class="section-sub section-sub--above">Education, experience and the work in between.</p>
+    <h2 class="display htl-title" id="htl-title">The Journey So Far</h2>
+  </div>
+  <div class="htl-stage">
+    <svg class="htl-svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path class="htl-track" d={d} pathLength="1" vector-effect="non-scaling-stroke" />
+      <path class="htl-draw" id="htl-line" d={d} pathLength="1" vector-effect="non-scaling-stroke" />
+      <path class="htl-arrow" d={arrowD} vector-effect="non-scaling-stroke" />
+      <circle class="htl-dot" r="11" cx="0" cy="0">
+        <animateMotion id="htl-travel" dur="3.2s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keyPoints="0;1" keySplines="0.4 0 0.2 1"><mpath href="#htl-line" /></animateMotion>
+      </circle>
+    </svg>
+    <ol class="htl-list">
+      {steps.map((s, i) => (
+        <li class:list={['htl-item', { 'is-live': s.live }]} style={`--x:${s.x};--y:${up(s.y)};--i:${i}`}>
+          <a class="htl-link" href={s.href}>
+            <svg class="htl-art" viewBox="0 0 120 120" aria-hidden="true" focusable="false" set:html={art[s.id]} />
+            <span class="htl-node" aria-hidden="true"></span>
+            <span class="htl-txt">
+              <span class="htl-pill">{s.date}</span>
+              <span class="htl-kind">{s.kind}</span>
+              <span class="htl-name">{s.head}</span>
+              <span class="htl-role">{s.role}</span>
+              {s.body && <span class="htl-body">{s.body}</span>}
+              <span class="htl-go" aria-hidden="true">↗</span>
+              <span class="sr-only">{s.cta}</span>
+            </span>
+          </a>
+          {s.overlap && <span class="htl-overlap"><span>Concurrent roles</span> Sep 2024 to Apr 2025, alongside Plutas.ai</span>}
+        </li>
+      ))}
+    </ol>
+    <aside class="htl-note" aria-label="Areas of focus">
+      <h3>Areas of Focus</h3>
+      <ul><li style="--c:0">Climate &amp; Data</li><li style="--c:1">Insurance Innovation</li><li style="--c:2">Product &amp; Strategy</li><li style="--c:3">Research &amp; Analytics</li></ul>
+    </aside>
+  </div>
+</section>
+<script>
+  // Progressive enhancement only: without this script everything is already visible.
+  const root = document.querySelector<HTMLElement>('[data-htl]');
+  if (root && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    root.classList.add('htl-anim');
+    const wide = matchMedia('(min-width: 1100px)');
+    const travel = root.querySelector<SVGAnimationElement>('#htl-travel');
+    const play = () => {
+      root.classList.add('is-in');
+      try { travel?.beginElement(); } catch { /* the dot is decoration */ }
+    };
+    const items = [...root.querySelectorAll<HTMLElement>('.htl-item')];
+    const note = root.querySelector<HTMLElement>('.htl-note');
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      io.unobserve(en.target);
+      if (en.target === root) play(); else en.target.classList.add('in');
+    }), { threshold: wide.matches ? 0.25 : 0.2 });
+    if (wide.matches) io.observe(root.querySelector('.htl-stage')!.parentElement!); else { root.classList.add('is-in'); items.forEach((li) => io.observe(li)); if (note) io.observe(note); }
+  }
+</script>

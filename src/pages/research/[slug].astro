@@ -1,0 +1,72 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const all = await getCollection('research', (r) => !r.data.draft);
+  return all.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const others = (await getCollection('research', (r) => !r.data.draft && r.id !== entry.id)).sort((a, b) => a.data.order - b.data.order).slice(0, 2);
+const abs = (p: string) => (Astro.site ? new URL(p, Astro.site).href : undefined);
+const work = {
+  '@context': 'https://schema.org', '@type': 'CreativeWork', name: d.title, url: abs(`/research/${entry.id}`),
+  author: d.authors.map((n) => ({ '@type': 'Person', name: n })),
+  // The source's presentation date as `dateCreated`; never presented as a publication date.
+  ...(d.isoDate ? { dateCreated: d.isoDate } : {}), sameAs: d.links.map((l) => l.url),
+};
+const dateLabel = d.publishedLabel ? 'Published' : 'Presented';
+const dateValue = d.publishedLabel ?? d.dateLabel;
+---
+<Base path={`/research/${entry.id}`} title={d.title} description={`${d.type} at ${d.event.split('(')[0]!.trim()}, ${d.dateLabel}. Arnav is listed as ${d.arnavPosition.toLowerCase()}. ${d.title.length > 90 ? d.title.slice(0, 87) + '…' : d.title}`} ogType="article" jsonLd={work}>
+  <header class="article-detail-header">
+    <div class="article-detail-meta"><span>Research</span><span aria-hidden="true">·</span><span>{d.readTime}</span></div>
+    <h1 class="article-detail-title">{d.title}</h1>
+  </header>
+
+  <div class="article-detail-hero">
+    <Image src={d.cover} alt={d.coverAlt} width={2000} widths={[750, 1500, 2000]} sizes="(max-width: 1548px) 100vw, 1500px" loading="eager" />
+  </div>
+
+  <div class="article-detail-byline">
+    <dl class="article-byline-meta">
+      <div class="byline-item"><dt class="byline-label">{dateLabel}</dt><dd class="byline-value">{dateValue}</dd></div>
+      <div class="byline-item"><dt class="byline-label">Author</dt><dd class="byline-value">Arnav Patnaik<span class="byline-sub">{d.arnavPosition}</span></dd></div>
+    </dl>
+    <div class="article-pullquote">
+      <p class="pullquote-text">&ldquo;{d.quote}&rdquo;</p>
+      <hr class="pullquote-divider" />
+    </div>
+  </div>
+
+  <div class="article-content article-content--solo">
+    <div class="article-body">
+      <h2>{d.title}</h2>
+      <h2 id="abstract">Abstract:</h2>
+      <Content />
+      <p>Check out the full version here: {d.links.map((l, i) => <>{i > 0 && ', '}<a href={l.url} target="_blank" rel="noopener noreferrer">{l.label}<span class="sr-only"> (opens in a new tab)</span></a></>)}</p>
+    </div>
+  </div>
+
+  <section class="recent-articles" aria-labelledby="recent-h">
+    <div class="recent-inner">
+      <div class="recent-header">
+        <h2 class="recent-title" id="recent-h">Recent articles</h2>
+        <a class="recent-view-all" href="/research">View all articles</a>
+      </div>
+      <div class="recent-grid recent-grid--two">
+        {others.map((o) => (
+          <article class="recent-card">
+            <div class="recent-thumb"><Image src={o.data.cover} alt={o.data.coverAlt} width={800} loading="lazy" /></div>
+            <h3 class="recent-card-title"><a href={`/research/${o.id}`}>{o.data.cardTitle}</a></h3>
+            <div class="article-meta"><span>Research</span><span aria-hidden="true">·</span><span>{o.data.readTime}</span></div>
+            <p class="recent-card-desc">{o.data.cardLine}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

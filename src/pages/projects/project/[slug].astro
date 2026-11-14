@@ -1,0 +1,82 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import Recent from '../../../components/Recent.astro';
+import PowerBIEmbed from '../../../components/PowerBiEmbed.astro';
+import { iconFor, initials } from '../../../data/toolIcons';
+
+export async function getStaticPaths() {
+  const all = await getCollection('work', (w) => import.meta.env.DEV || !w.data.draft);
+  const sorted = all.sort((a, b) => a.data.order - b.data.order);
+  return sorted.map((entry, i) => ({ params: { slug: entry.id }, props: { entry, n: i + 1 } }));
+}
+const { entry, n } = Astro.props;
+const d = entry.data;
+const cover = true;
+const { Content, headings } = await render(entry);
+// With a dashboard, the report sits straight after the Overview, ahead of "My contribution".
+const html = entry.rendered?.html ?? '';
+const cut = html.indexOf('<h2 id="my-contribution"');
+const intro = d.dashboard && cut > 0 ? html.slice(0, cut) : null;
+const rest = cut > 0 ? html.slice(cut) : '';
+const toc = [...headings.filter((h) => h.depth === 2).map((h) => ({ id: h.slug, text: h.text })), ...(d.toolGroups.length > 0 ? [{ id: 'tools', text: 'Tools' }] : [])];
+---
+<Base path={`/projects/project/${entry.id}`} title={d.title} description={d.summary} ogType="article">
+  <header class="article-detail-header">
+    <div class="article-detail-meta"><span>Project 0{n}</span></div>
+    <h1 class="article-detail-title">{d.title}</h1>
+    <p class="article-detail-sub">{d.summary}</p>
+  </header>
+  {cover && <div class="article-detail-hero project-video-hero"><video src={`/media/projects/${n}-4k.mp4`} poster={`/media/projects/${n}.jpg`} autoplay muted loop playsinline preload="metadata" aria-label={`Screen recording of ${d.title}`}></video></div>}
+
+  <div class="article-content">
+    <div class="article-byline-meta">
+      <dl style="display:contents">
+        {d.projectName && <div class="byline-item"><dt class="byline-label">Project</dt><dd class="byline-value" style="font-size:17px">{d.projectName}</dd></div>}
+        <div class="byline-item"><dt class="byline-label">Context</dt><dd class="byline-value" style="font-size:17px">{d.context}</dd></div>
+        {d.period && <div class="byline-item"><dt class="byline-label">Period</dt><dd class="byline-value">{d.period}</dd></div>}
+        {d.role && <div class="byline-item"><dt class="byline-label">My role</dt><dd class="byline-value">{d.role}</dd></div>}
+        {d.domain && <div class="byline-item"><dt class="byline-label">Domain</dt><dd class="byline-value" style="font-size:17px">{d.domain}</dd></div>}
+        {d.award && <div class="byline-item"><dt class="byline-label">Recognition</dt><dd class="byline-value" style="font-size:17px">{d.award}</dd></div>}
+      </dl>
+      <nav class="toc" aria-label="On this page"><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.text}</a></li>)}</ol></nav>
+    </div>
+
+    <article class="article-body">
+      <div class="project-link-row" aria-label="Project links">
+        <a class="dlg-link" href={d.github} target="_blank" rel="noopener noreferrer">GitHub ↗<span class="sr-only"> (opens in a new tab)</span></a>
+        {d.youtube && <a class="dlg-link outline" href={d.youtube} target="_blank" rel="noopener noreferrer">YouTube ↗<span class="sr-only"> (opens in a new tab)</span></a>}
+        {d.linkedin && <a class="dlg-link outline" href={d.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn post ↗<span class="sr-only"> (opens in a new tab)</span></a>}
+      </div>
+
+      {d.dashboard && intro !== null
+        ? <>
+            <div class="project-md" set:html={intro} />
+            <PowerBIEmbed src={d.dashboard} title={d.title} />
+            <div class="project-md" set:html={rest} />
+          </>
+        : <div class="project-md"><Content /></div>}
+
+      {d.toolGroups.length > 0 && (
+        <section class="cs-section" id="tools" aria-labelledby="tools-h">
+          <h2 id="tools-h">Tools</h2>
+          {d.toolGroups.map((g) => (
+            <>
+              {g.title && <h3>{g.title}</h3>}
+              <ul class="tool-icons">{g.items.map((t) => <li>{iconFor(t) ? <Image src={iconFor(t)!} alt="" width={56} height={56} loading="lazy" /> : <span class="tool-dot" aria-hidden="true">{initials(t)}</span>}<span>{t}</span></li>)}</ul>
+            </>
+          ))}
+        </section>
+      )}
+
+      {d.certificate && <figure class="project-cert"><Image src={d.certificate.src} alt={d.certificate.alt} width={1400} loading="lazy" /><figcaption class="cover-note">{d.certificate.caption}</figcaption></figure>}
+    </article>
+  </div>
+
+  <Recent exclude={`/projects/project/${entry.id}`} />
+  <script>
+    // Reduced motion: keep the still poster instead of autoplaying.
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector<HTMLVideoElement>('.project-video-hero video')?.pause();
+  </script>
+</Base>

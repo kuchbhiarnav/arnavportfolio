@@ -1,0 +1,87 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/logo-white.png';
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+const mailBody = [
+  'Hi Arnav,', '',
+  'I came across your portfolio and would love to connect regarding a potential opportunity or collaboration.', '',
+  'A little about what I have in mind:', '',
+  '* Project / Opportunity: What I\'m working on or looking to discuss.',
+  '* How we could collaborate: Where I think your experience or expertise could add value.',
+  '* Timeline: Expected start date or duration, if applicable.',
+  '* Budget: Available budget or compensation range, if established.', '',
+  'A little about me:',
+  'My name is [Your Name], and I represent [Organisation / Company]. Here\'s a little context about what we do: [Brief introduction].', '',
+  'Let\'s connect:',
+  'The best way to reach me is [Email / Phone / WhatsApp]. I\'m generally available [Preferred days and times].', '',
+  'Looking forward to connecting!', '',
+  'Best regards,',
+  '[Your Name]',
+].join('\n');
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent('Let\'s talk: [your topic]')}&body=${encodeURIComponent(mailBody)}`;
+const calendly = 'https://calendly.com/patnaikarnav3';
+---
+<footer class="footer on-blue">
+  <div class="footer-body">
+    <div class="footer-logo"><Image src={logo} alt="Arnav" width={760} densities={[1, 2]} loading="lazy" /></div>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <p class="footer-tags">Product Strategy · Business &amp; Data Analytics · Climate-tech</p>
+        <p class="footer-statement">I work at the intersection of product, strategy and technology, turning complex problems into meaningful products, insights and solutions.</p>
+      </div>
+      <div class="footer-col">
+        <h2 class="footer-col-title">Explore</h2>
+        <div class="footer-col-body">
+          <a href="/about">About</a>
+          <a href="/about#experience">Experience</a>
+          <a href="/projects">Projects</a>
+          <a href={site.cv.href} target="_blank" rel="noopener noreferrer" data-track="cv_download">Download CV <span aria-hidden="true">↗</span><span class="sr-only"> (PDF, opens in a new tab)</span></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h2 class="footer-col-title">Get in touch</h2>
+        <div class="footer-col-body">
+          <span>{site.location}</span>
+          <a href={mailto}>Email me <span aria-hidden="true">↗</span></a>
+          <a href={calendly} target="_blank" rel="noopener noreferrer" >Schedule a call <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h2 class="footer-col-title">Elsewhere</h2>
+        <div class="footer-col-body">
+          <a href={site.links.linkedin} target="_blank" rel="noopener noreferrer"><span class="si si-li" aria-hidden="true"></span> LinkedIn<span class="sr-only"> (opens in a new tab)</span></a>
+          <a href={site.links.github} target="_blank" rel="noopener noreferrer"><span class="si si-gh" aria-hidden="true"></span> GitHub<span class="sr-only"> (opens in a new tab)</span></a>
+          <a href={site.links.researchgate} target="_blank" rel="noopener noreferrer"><span class="si si-rg" aria-hidden="true"></span> ResearchGate<span class="sr-only"> (opens in a new tab)</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span>©{year} Arnav Patnaik. All rights reserved.</span>
+    <div class="footer-bar-links">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <button class="footer-top" type="button" aria-label="Back to top"><span aria-hidden="true">↑</span></button>
+    </div>
+  </div>
+</footer>
+<button class="to-top" type="button" aria-label="Back to top" hidden><span aria-hidden="true">↑</span></button>
+<script>
+  const goTop = () => { window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); (document.getElementById('main') as HTMLElement | null)?.focus({ preventScroll: true }); };
+  document.querySelector('.footer-top')?.addEventListener('click', goTop);
+  const top = document.querySelector<HTMLButtonElement>('.to-top');
+  if (top) {
+    const sync = () => { top.hidden = window.scrollY < 400; };
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+    top.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); (document.getElementById('main') as HTMLElement | null)?.focus({ preventScroll: true }); });
+  }
+</script>
+<script>
+  // While any part of the footer is on screen, the floating question bar steps aside so it never covers it.
+  const legal = document.querySelector('.footer');
+  if (legal && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([en]) => { document.documentElement.toggleAttribute('data-footer-view', !!en?.isIntersecting); }, { threshold: 0.01 }).observe(legal);
+  }
+</script>

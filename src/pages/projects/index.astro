@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import pointing from '../../assets/brand/pointing-down.webp';
+import Tile from '../../components/Tile.astro';
+import WorkTogether from '../../components/WorkTogether.astro';
+import { caseCovers, caseVideos } from '../../data/covers';
+
+const show = (d: { draft: boolean }) => import.meta.env.DEV ? true : !d.draft;
+const cases = (await getCollection('caseStudies', (c) => show(c.data))).filter((c) => !c.data.draft).sort((a, b) => a.data.order - b.data.order);
+const work = (await getCollection('work', (w) => show(w.data))).sort((a, b) => a.data.order - b.data.order);
+---
+<Base path="/projects" title="Projects" blueNav description="Work highlights on groundwater arsenic decision support and a parametric insurance platform, plus data and analytics projects.">
+  <section class="projects-hero" aria-labelledby="work-title">
+    <div class="projects-hero-inner projects-hero-row">
+      <h1 class="projects-hero-title" id="work-title">Projects</h1>
+<div class="hero-pointer" data-pointer aria-hidden="true">
+        <Image class="hero-pointer-still" src={pointing} width={800} height={744} widths={[360, 540, 800]} sizes="(max-width: 768px) 55vw, 30vw" alt="" loading="eager" fetchpriority="high" />
+        <video class="hero-pointer-video" muted loop playsinline preload="none" tabindex="-1" disablepictureinpicture data-src="/media/hero/pointing-down.webm"></video>
+      </div>
+    </div>
+  </section>
+
+  <div class="filter-bar" role="group" aria-label="Filter projects">
+    <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter-btn" type="button" data-filter="case" aria-pressed="false">Work Highlights</button>
+    <button class="filter-btn" type="button" data-filter="project" aria-pressed="false">Data &amp; Analytics</button>
+  </div>
+  <p class="sr-only" role="status" id="filter-status"></p>
+
+  <div class="all-projects-wrap">
+    <h2 class="sr-only">Work Highlights and Data &amp; Analytics</h2>
+    <div class="all-projects-grid" id="grid">
+      {cases.map((c, i) => <Tile all kind="case" n={`Work Highlight 0${i + 1}`} name={c.data.shortTitle} href={`/projects/${c.id}`} logo={caseCovers[c.id]?.logo} logoAlt={caseCovers[c.id]?.alt} video={caseVideos[c.id]?.card} context={c.data.cardLine ?? c.data.summary} />)}
+      {work.map((p, i) => (
+        <Tile all kind="project" n={`Project 0${i + 1}`} name={p.data.cardTitle ?? p.data.title} href={`/projects/project/${p.id}`} video={`/media/projects/${i + 1}`} coverAlt={`Screen recording of ${p.data.cardTitle ?? p.data.title}`} context={p.data.cardContext ?? p.data.context} award={p.data.cardAward ?? p.data.award} />
+      ))}
+    </div>
+  </div>
+
+  <WorkTogether />
+
+  <script>
+    // Filter: all tiles are visible without JavaScript; with it, the buttons narrow the grid and announce the result.
+    const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const cards = document.querySelectorAll<HTMLElement>('#grid .all-project-card');
+    const status = document.getElementById('filter-status');
+    btns.forEach((b) => b.addEventListener('click', () => {
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      const f = b.dataset.filter;
+      let n = 0;
+      cards.forEach((c) => { const on = f === 'all' || c.dataset.kind === f; c.hidden = !on; if (on) n++; });
+      if (status) status.textContent = `Showing ${n} item${n === 1 ? '' : 's'}.`;
+    }));
+    // Old links like /projects#telangana-tourism-dashboard now go to that project's page.
+    const hash = location.hash.slice(1);
+    if (hash && document.querySelector(`a[href="/projects/project/${CSS.escape(hash)}"]`)) location.replace(`/projects/project/${hash}`);
+  </script>
+</Base>
+
+<script>
+  // The hero portrait is a transparent video (VP9 with alpha). Browsers that cannot show the transparency (Safari draws it on black)
+  // and visitors who prefer reduced motion keep the still image. The check draws one frame and reads the corner pixel, so it never
+  // relies on guessing the browser.
+  document.querySelectorAll<HTMLElement>('[data-pointer]').forEach((box) => {
+    const v = box.querySelector<HTMLVideoElement>('video');
+    if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches || !v.canPlayType('video/webm; codecs="vp9"')) return;
+    v.addEventListener('loadeddata', () => {
+      try {
+        const c = document.createElement('canvas'); c.width = c.height = 8;
+        const g = c.getContext('2d', { willReadFrequently: true })!;
+        g.drawImage(v, 0, 0, 8, 8);
+        if (g.getImageData(0, 0, 1, 1).data[3] !== 0) return; // corner is opaque: no alpha support
+      } catch { return; }
+      box.classList.add('is-video');
+      void v.play().catch(() => box.classList.remove('is-video'));
+    }, { once: true });
+    v.preload = 'auto';
+    v.src = v.dataset.src!;
+    v.load();
+  });
+</script>
