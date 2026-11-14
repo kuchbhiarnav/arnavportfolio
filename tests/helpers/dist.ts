@@ -1,11 +1,11 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-export const DIST = join(process.cwd(), 'dist', 'client');
+export const DIST = join(process.cwd(), '.vercel', 'output', 'static');
 export const built = existsSync(join(DIST, 'index.html'));
 
 export function needBuild() {
-  if (!built) throw new Error('dist/client is missing. Run `npm run build` first (or `npm run verify`).');
+  if (!built) throw new Error('The build output (.vercel/output/static) is missing. Run `npm run build` first (or `npm run verify`).');
 }
 
 export function htmlFiles(dir = DIST): string[] {
@@ -17,5 +17,6 @@ export function htmlFiles(dir = DIST): string[] {
   }
   return out;
 }
-export const routeOf = (file: string) => '/' + relative(DIST, file).replace(/\.html$/, '').replace(/^index$/, '');
+// Vercel writes pages as directories (/about/index.html); the public URL is /about.
+export const routeOf = (file: string) => '/' + relative(DIST, file).replace(/\.html$/, '').replace(/(^|\/)index$/, '');
 export const read = (file: string) => readFileSync(file, 'utf8');

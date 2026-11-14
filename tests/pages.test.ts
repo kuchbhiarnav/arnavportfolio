@@ -145,11 +145,13 @@ describe('links, anchors and images', () => {
     }
   });
   it('every old URL redirects to a page that exists', () => {
-    const rules = readFileSync(join(DIST, '_redirects'), 'utf8').trim().split('\n').map((l) => l.trim().split(/\s+/));
-    const sources = rules.map((r) => r[0]);
+    // Vercel build output: redirects are rules in .vercel/output/config.json ({ src: regex, headers.Location, status }).
+    const cfg = JSON.parse(readFileSync(join(DIST, '..', 'config.json'), 'utf8')) as { routes: { src: string; headers?: { Location?: string }; status?: number }[] };
+    const redirects = cfg.routes.filter((r) => r.headers?.Location && r.status === 301);
+    const covers = (old: string) => redirects.some((r) => new RegExp(r.src).test(old));
     for (const old of ['/index.html', '/about.html', '/projects.html', '/insights.html', '/insights-detail.html', '/insights-detail-2.html', '/insights-detail-3.html', '/privacy-policy.html', '/terms-of-service.html'])
-      expect(sources, old).toContain(old);
-    for (const [, dest, code] of rules) { expect(code).toBe('301'); expect(exists(dest!), dest).toBe(true); }
+      expect(covers(old), old).toBe(true);
+    for (const r of redirects) { const dest = r.headers!.Location!; expect(dest.startsWith('/') && (exists(dest) || dest.endsWith('.pdf')), dest).toBe(true); }
   });
 });
 

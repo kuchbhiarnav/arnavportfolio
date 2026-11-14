@@ -897,7 +897,8 @@ html[data-footer-view] .to-top { display: none; }
    Shipped as PNG (64px, plus a 128px copy for sharp screens): browsers ignore some SVG cursors, PNG always works. */
 @media (hover: hover) and (pointer: fine) {
   .all-project-card, .all-project-card a, .all-project-card button,
-  .project-card, .project-card a, .project-card button {
+  .project-card, .project-card a, .project-card button,
+  .all-project-card .tile-link::after, .project-card .tile-link::after {
     cursor: url('/cursor/project.png') 32 32, pointer;
     cursor: image-set(url('/cursor/project.png') 1x, url('/cursor/project@2x.png') 2x) 32 32, pointer;
   }

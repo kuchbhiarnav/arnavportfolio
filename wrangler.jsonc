@@ -1,8 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "arnavs-archive",
-  // Custom entry: re-exports Astro's handler and the Durable Object class used as the AI usage gate.
-  "main": "./src/worker.ts",
   // Matches the workerd build bundled with this Wrangler version (checked 2026-11-07).
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
