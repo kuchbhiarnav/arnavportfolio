@@ -1,3 +1,5 @@
+> **Update, 14 November 2026:** the chatbot (assistant), the Gemini API and the Cloudflare Worker setup have been removed. The site is fully static and deploys on Vercel. Parts of this document that describe them are historical.
+
 # 05 — Setup and environment
 
 ## Run it locally

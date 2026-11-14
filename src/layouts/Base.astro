@@ -3,7 +3,6 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ConsentBanner from '../components/ConsentBanner.astro';
-import Assistant from '../assistant/Assistant';
 import { site } from '../data/site';
 
 interface Props {
@@ -64,7 +63,6 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     </main>
     <Footer />
     <ConsentBanner />
-    <Assistant client:idle />
     <script>
       // Shadow under the nav once the page scrolls; hamburger is a real disclosure button.
       const nav = document.getElementById('navbar');

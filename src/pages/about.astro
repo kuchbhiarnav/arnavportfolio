@@ -11,7 +11,7 @@ import sqlCert from '../assets/certificates/codebasics-sql.jpg';
 import excelCert from '../assets/certificates/udemy-excel.jpg';
 import marketingCert from '../assets/certificates/udemy-digital-marketing.jpg';
 import { education, roles } from '../data/experience';
-import { rangeNumeric } from '../lib/knowledge';
+import { rangeNumeric } from '../lib/dates';
 import { site } from '../data/site';
 
 const person = { '@context': 'https://schema.org', '@type': 'Person', name: site.name, description: site.description, sameAs: Object.values(site.links) };
@@ -53,7 +53,7 @@ const certs = [
         <div class="bio-sidebar-col">
           <h2>Contact</h2>
           <ul>
-            <li><a href={`mailto:${site.email}`}>email</a></li>
+            <li><a href={`mailto:${site.email}?subject=${encodeURIComponent('Collaboration enquiry [AP-000000-0000]')}&body=${encodeURIComponent('Hello Arnav,\n\nI would like to explore a collaboration with you.\n\nAbout me / my organisation:\n- Name:\n- Organisation and role:\n\nAbout the opportunity:\n- What it is about:\n- How you could contribute:\n- Expected timeline:\n- Budget or compensation (if known):\n\nBest way to reach me (email, phone or WhatsApp) and when:\n\nBest regards,\n')}`} data-ticket-mail>email</a></li>
             <li><a href={site.links.linkedin} target="_blank" rel="noopener noreferrer">linkedin<span class="sr-only"> (opens in a new tab)</span></a></li>
             <li><a href={site.links.github} target="_blank" rel="noopener noreferrer">github<span class="sr-only"> (opens in a new tab)</span></a></li>
             <li><a href={site.links.researchgate} target="_blank" rel="noopener noreferrer">researchgate<span class="sr-only"> (opens in a new tab)</span></a></li>

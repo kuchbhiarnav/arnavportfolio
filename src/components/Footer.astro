@@ -3,23 +3,9 @@ import { Image } from 'astro:assets';
 import logo from '../assets/brand/logo-white.png';
 import { site } from '../data/site';
 const year = new Date().getFullYear();
-const mailBody = [
-  'Hi Arnav,', '',
-  'I came across your portfolio and would love to connect regarding a potential opportunity or collaboration.', '',
-  'A little about what I have in mind:', '',
-  '* Project / Opportunity: What I\'m working on or looking to discuss.',
-  '* How we could collaborate: Where I think your experience or expertise could add value.',
-  '* Timeline: Expected start date or duration, if applicable.',
-  '* Budget: Available budget or compensation range, if established.', '',
-  'A little about me:',
-  'My name is [Your Name], and I represent [Organisation / Company]. Here\'s a little context about what we do: [Brief introduction].', '',
-  'Let\'s connect:',
-  'The best way to reach me is [Email / Phone / WhatsApp]. I\'m generally available [Preferred days and times].', '',
-  'Looking forward to connecting!', '',
-  'Best regards,',
-  '[Your Name]',
-].join('\n');
-const mailto = `mailto:${site.email}?subject=${encodeURIComponent('Let\'s talk: [your topic]')}&body=${encodeURIComponent(mailBody)}`;
+// A short, generic message. The subject carries a ticket code (AP-YYMMDD-XXXX) so each enquiry can be tracked in the inbox;
+// the script below swaps in a fresh code each time the link is used. The static code is only the no-JavaScript fallback.
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent('Collaboration enquiry [AP-000000-0000]')}&body=${encodeURIComponent('Hello Arnav,\n\nI would like to explore a collaboration with you.\n\nAbout me / my organisation:\n- Name:\n- Organisation and role:\n\nAbout the opportunity:\n- What it is about:\n- How you could contribute:\n- Expected timeline:\n- Budget or compensation (if known):\n\nBest way to reach me (email, phone or WhatsApp) and when:\n\nBest regards,\n')}`;
 const calendly = 'https://calendly.com/patnaikarnav3';
 ---
 <footer class="footer on-blue">
@@ -43,7 +29,7 @@ const calendly = 'https://calendly.com/patnaikarnav3';
         <h2 class="footer-col-title">Get in touch</h2>
         <div class="footer-col-body">
           <span>{site.location}</span>
-          <a href={mailto}>Email me <span aria-hidden="true">↗</span></a>
+          <a href={mailto} data-ticket-mail>Email me <span aria-hidden="true">↗</span></a>
           <a href={calendly} target="_blank" rel="noopener noreferrer" >Schedule a call <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
         </div>
       </div>
@@ -68,6 +54,20 @@ const calendly = 'https://calendly.com/patnaikarnav3';
 </footer>
 <button class="to-top" type="button" aria-label="Back to top" hidden><span aria-hidden="true">↑</span></button>
 <script>
+  // Email links get a new ticket code in the subject line each time they are used.
+  const ticket = () => {
+    const d = new Date();
+    const ymd = String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const r = crypto.getRandomValues(new Uint8Array(4));
+    return `AP-${ymd}-${Array.from(r, (n) => abc[n % abc.length]).join('')}`;
+  };
+  document.querySelectorAll<HTMLAnchorElement>('a[data-ticket-mail]').forEach((a) => {
+    const fresh = () => { a.href = a.href.replace(/AP-[0-9]{6}-[0-9A-Z]{4}|AP-000000-0000/i, ticket()); };
+    ['pointerdown', 'focus', 'click', 'touchstart'].forEach((ev) => a.addEventListener(ev, fresh, { passive: true }));
+  });
+</script>
+<script>
   const goTop = () => { window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); (document.getElementById('main') as HTMLElement | null)?.focus({ preventScroll: true }); };
   document.querySelector('.footer-top')?.addEventListener('click', goTop);
   const top = document.querySelector<HTMLButtonElement>('.to-top');
@@ -79,7 +79,7 @@ const calendly = 'https://calendly.com/patnaikarnav3';
   }
 </script>
 <script>
-  // While any part of the footer is on screen, the floating question bar steps aside so it never covers it.
+  // While any part of the footer is on screen, the floating back-to-top button hides; the footer has its own.
   const legal = document.querySelector('.footer');
   if (legal && 'IntersectionObserver' in window) {
     new IntersectionObserver(([en]) => { document.documentElement.toggleAttribute('data-footer-view', !!en?.isIntersecting); }, { threshold: 0.01 }).observe(legal);

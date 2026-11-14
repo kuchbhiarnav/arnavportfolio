@@ -1,6 +1,6 @@
 /**
  * Consent-gated analytics. Google Analytics is not requested, and no cookie is set, until the visitor accepts.
- * Never sent to analytics: assistant questions, voice transcripts, contact messages, or any free text.
+ * Never sent to analytics: contact messages or any free text.
  */
 const KEY = 'archive:analytics-consent';
 const INTERNAL = 'archive:internal'; // set to "1" in your own browser to exclude your visits

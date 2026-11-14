@@ -17,7 +17,7 @@ const work = (await getCollection('work', (w) => show(w.data))).sort((a, b) => a
       <h1 class="projects-hero-title" id="work-title">Projects</h1>
 <div class="hero-pointer" data-pointer aria-hidden="true">
         <Image class="hero-pointer-still" src={pointing} width={800} height={744} widths={[360, 540, 800]} sizes="(max-width: 768px) 55vw, 30vw" alt="" loading="eager" fetchpriority="high" />
-        <video class="hero-pointer-video" muted loop playsinline preload="none" tabindex="-1" disablepictureinpicture data-src="/media/hero/pointing-down.webm"></video>
+        <video class="hero-pointer-video" muted loop playsinline preload="none" tabindex="-1" disablepictureinpicture data-src="/media/hero/pointing-down.webm" data-src-apple="/media/hero/pointing-down.mov"></video>
       </div>
     </div>
   </section>
@@ -62,12 +62,17 @@ const work = (await getCollection('work', (w) => show(w.data))).sort((a, b) => a
 <script>
   // The hero portrait is a transparent video (VP9 with alpha). Browsers that cannot show the transparency (Safari draws it on black)
   // and visitors who prefer reduced motion keep the still image. The check draws one frame and reads the corner pixel, so it never
-  // relies on guessing the browser.
+  // relies on guessing the browser. The .mov is known to carry alpha, so it skips that check.
+  // Safari and every iPhone browser draw WebM transparency on black, so they get an HEVC-with-alpha copy (.mov) that they do support.
+  const ua = navigator.userAgent;
+  const apple = /AppleWebKit/.test(ua) && !/Chrome\/|Chromium|Edg\/|Android/.test(ua);
   document.querySelectorAll<HTMLElement>('[data-pointer]').forEach((box) => {
     const v = box.querySelector<HTMLVideoElement>('video');
-    if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches || !v.canPlayType('video/webm; codecs="vp9"')) return;
+    if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const useMov = apple && !!v.canPlayType('video/mp4; codecs="hvc1"');
+    if (!useMov && !v.canPlayType('video/webm; codecs="vp9"')) return;
     v.addEventListener('loadeddata', () => {
-      try {
+      if (!useMov) try {
         const c = document.createElement('canvas'); c.width = c.height = 8;
         const g = c.getContext('2d', { willReadFrequently: true })!;
         g.drawImage(v, 0, 0, 8, 8);
@@ -77,7 +82,7 @@ const work = (await getCollection('work', (w) => show(w.data))).sort((a, b) => a
       void v.play().catch(() => box.classList.remove('is-video'));
     }, { once: true });
     v.preload = 'auto';
-    v.src = v.dataset.src!;
+    v.src = useMov ? v.dataset.srcApple! : v.dataset.src!;
     v.load();
   });
 </script>

@@ -19,7 +19,7 @@
   --gold: #f5a623;
   --green: #1e6f5c; /* the CTA hover colour from the original */
 
-  /* tokens used by the widgets (assistant, consent banner, explainer) */
+  /* tokens used by the widgets (consent banner, explainer) */
   --blue-deep: #003a8c;
   --ink: #000;
   --muted: #55504a;
@@ -543,7 +543,7 @@ button.tile-link:focus-visible, a.tile-link:focus-visible { outline: none; }
   .wt-card { transition: none; }
   .nav-btn:hover { transform: none; }
 }
-@media print { .nav, .footer, .assistant, .consent, .skip, .work-together { display: none !important; } body { padding: 0; } }
+@media print { .nav, .footer, .consent, .skip, .work-together { display: none !important; } body { padding: 0; } }
 /* ─── additions for the Résumé / Contact pages ─── */
 .projects-hero--short { min-height: 360px; padding-bottom: 40px; }
 .cv-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; color: var(--blue-l); }
@@ -798,9 +798,6 @@ button.tile-link:focus-visible, a.tile-link:focus-visible { outline: none; }
 /* Footer: the legal row always has room under it, so the floating buttons never sit on top of Privacy or Terms. */
 .footer-bar-links { align-items: center; }
 
-/* The question bar steps aside while the legal row is on screen (see Footer.astro). It stays if it is open or focused. */
-.assistant { transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease; }
-html[data-footer-view] .assistant:not(:focus-within):not(:has(.a-panel)) { opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 16px); }
 
 /* Phones and small tablets: readable text, no desktop-sized gaps, one deliberate footer. */
 @media (max-width: 768px) {
@@ -899,7 +896,69 @@ html[data-footer-view] .to-top { display: none; }
   .all-project-card, .all-project-card a, .all-project-card button,
   .project-card, .project-card a, .project-card button,
   .all-project-card .tile-link::after, .project-card .tile-link::after {
-    cursor: url('/cursor/project.png') 32 32, pointer;
-    cursor: image-set(url('/cursor/project.png') 1x, url('/cursor/project@2x.png') 2x) 32 32, pointer;
+    cursor: url('/cursor/project-lg.png') 48 48, pointer;
+    cursor: image-set(url('/cursor/project-lg.png') 1x, url('/cursor/project-lg@2x.png') 2x) 48 48, pointer;
   }
+}
+
+/* ─── PHONE / TABLET REFINEMENTS (14 Nov 2026, final layer) ─── */
+.recent-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 768px) {
+  /* Air between the Areas of Focus note and Selected Work. */
+  .htl { padding-bottom: 24px; }
+  .htl ~ .section-head { padding-top: 56px; }
+
+  /* "View all projects" runs edge to edge, as on larger screens. */
+  .cta-wrap { padding: 0; }
+  .cta-btn { border-radius: 40px; }
+
+  /* Skills stack: bigger icons, rows close together. Names only appear on hover, so on a phone they take no room. */
+  .skills-section { padding: 44px 0 48px; gap: 0; }
+  .skills-heading { margin-bottom: 8px; }
+  .marquee-track { padding: 6px 20px; gap: 26px; }
+  .skill-icon { width: 76px; gap: 0; }
+  .skill-icon img { width: 72px; height: 72px; }
+  .skill-icon span { display: none; }
+
+  /* Let's work together: the bars sit close to the words and the card is only as tall as it needs to be. */
+  .wt-text { font-size: clamp(56px, 18vw, 110px); }
+  .wt-card { height: 300px; }
+  .work-together { min-height: 0; height: auto; padding: 36px 0; }
+  .work-together .wt-card { position: relative; }
+  .wt-card.flipped { height: 600px; }
+  .work-together:has(.wt-card.flipped) { height: auto; }
+
+  /* Footer: everything centred. */
+  .footer-body { align-items: center; text-align: center; }
+  .footer-logo { align-self: center; }
+  .footer-logo img { margin-inline: auto; }
+  .footer-grid { justify-items: center; }
+  .footer-statement { margin-inline: auto; }
+  .footer-col { align-items: center; }
+  .footer-col-body { align-items: center; }
+  .footer-col-body a, .footer-col-body span { justify-content: center; }
+  .footer-col:last-child .footer-col-body { justify-content: center; }
+  .footer-bar { align-items: center; text-align: center; }
+  .footer-bar-links { justify-content: center; }
+
+  /* About and Projects heroes: no empty blue band above the title and portrait. */
+  .projects-hero, .about-hero { min-height: 0; padding-top: 28px; }
+  .projects-hero { --ph: clamp(170px, 52vw, 280px); }
+  .about-hero { --ph: clamp(150px, 46vw, 230px); }
+
+  /* Insights: the title sits close to the picture above it and the first card below. */
+  .insights-grid-section { padding: 36px 20px 20px; }
+  .insights-grid-heading { margin-bottom: 24px; }
+  .insights-grid { padding-bottom: 64px; }
+}
+
+/* Tablets: breathing room for the sticky note, and a slimmer footer base. */
+@media (min-width: 769px) and (max-width: 1099.98px) {
+  .footer { padding-bottom: 16px; gap: 28px; }
+  .footer-bar { padding: 16px 45px 0; }
+}
+@media (min-width: 1100px) and (max-width: 1499.98px) {
+  .htl-stage { margin-top: 190px; }
+  .htl-note { top: -150px; }
 }

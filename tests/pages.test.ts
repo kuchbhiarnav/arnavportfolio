@@ -99,12 +99,11 @@ describe('truthful content', () => {
     for (const gone of ['data', 'sources']) expect(ids, gone).not.toContain(gone);
     for (const s of pi.doc.querySelectorAll('section.cs-section')) expect(s.textContent!.trim().length).toBeGreaterThan(40);
   });
-  it('reflects reality in the privacy page (consent-gated analytics, AI off, Calendly on demand)', () => {
+  it('reflects reality in the privacy page (consent-gated analytics, Calendly on demand, no assistant or measurement ID)', () => {
     const t = text('/privacy');
     expect(t).toMatch(/only if you accept/i);
-    expect(t).toMatch(/at the time of this update it is off/i);
+    expect(t).not.toMatch(/gemini|assistant|voice input|G-[A-Z0-9]{8,}/i);
     expect(t).toMatch(/Nothing is requested from Calendly until you open the card/i);
-    expect(t).toMatch(/may send audio to the browser vendor/i);
   });
 });
 
@@ -162,7 +161,6 @@ describe('weight budgets', () => {
     const home = pages.find((p) => p.route === '/')!;
     const srcs = new Set<string>();
     for (const m of home.html.matchAll(/(?:component-url|renderer-url|src)="(\/_astro\/[^"]+\.js)"/g)) srcs.add(m[1]!);
-    expect(srcs.size).toBeGreaterThan(0);
     const total = [...srcs].reduce((n, s) => n + gz(join(DIST, s)), 0);
     expect(total, `home JS (gzip) = ${(total / 1024).toFixed(1)} KB`).toBeLessThan(110 * 1024);
   });

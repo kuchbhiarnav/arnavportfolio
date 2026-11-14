@@ -2,7 +2,6 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
-import { fileURLToPath } from 'node:url';
 import sitemap from '@astrojs/sitemap';
 
 // Canonical origin, e.g. https://example.com. Unset => no canonical/OG absolute URLs and no sitemap
@@ -11,14 +10,12 @@ const site = process.env.SITE_URL || undefined;
 
 export default defineConfig({
   site,
-  // Static by default. Only /api/* routes opt out with `export const prerender = false`.
+  // Fully static.
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file' },
-  // Deployed on Vercel. The two /api routes still import the Cloudflare-only module, so it is aliased to a small shim:
-  // AI mode stays off (its usage gate is a Cloudflare Durable Object) and the assistant answers from the in-browser search.
+  // Deployed on Vercel. The site is fully static: there are no server routes.
   adapter: vercel(),
-  vite: { resolve: { alias: { 'cloudflare:workers': fileURLToPath(new URL('./src/lib/cloudflare-workers-shim.ts', import.meta.url)) } } },
   // The site keeps no server-side sessions, so don't provision the adapter's default KV binding.
   session: false,
   integrations: [react(), ...(site ? [sitemap()] : [])],
