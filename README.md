@@ -1,6 +1,6 @@
-# Arnav's Archive
+# Arnav's Portfolio
 
-Astro 7 + TypeScript portfolio, fully static, deployed on Vercel from GitHub. The original Arnav's Archive look, rebuilt on accessible foundations, with evidence-linked case studies.
+Astro 7 + TypeScript portfolio, fully static, deployed on Vercel from GitHub. The original Arnav's Portfolio look, rebuilt on accessible foundations, with evidence-linked case studies.
 
 ```bash
 npm install

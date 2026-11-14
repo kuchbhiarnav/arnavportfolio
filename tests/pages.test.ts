@@ -45,12 +45,12 @@ describe('metadata', () => {
   it('indexes everything except the 404 page', () => {
     for (const p of pages) expect(!!p.doc.querySelector('meta[name=robots][content*=noindex]'), p.route).toBe(p.route === '/404');
   });
-  it('carries social tags, and never an invented absolute URL when SITE_URL is unset', () => {
+  it('carries social tags and a canonical URL on the live domain', () => {
     for (const p of pages) {
       expect(p.doc.querySelector('meta[property="og:title"]'), p.route).toBeTruthy();
       expect(p.doc.querySelector('meta[name="twitter:card"]')).toBeTruthy();
-      expect(p.doc.querySelector('link[rel=canonical]'), `${p.route} must not guess a domain`).toBeNull();
-      expect(p.doc.querySelector('meta[property="og:image"]')).toBeNull();
+      expect(p.doc.querySelector('link[rel=canonical]')?.getAttribute('href'), p.route).toMatch(/^https:\/\/arnavpatnaik\.in/);
+      expect(p.doc.querySelector('meta[property="og:image"]')).toBeTruthy();
     }
   });
   it('has valid JSON-LD with no invented publication dates', () => {

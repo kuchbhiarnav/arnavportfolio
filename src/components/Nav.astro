@@ -12,7 +12,7 @@ const items = [
 const isCurrent = (href: string) => current === href || current.startsWith(href + '/');
 ---
 <header class:list={['nav', { 'nav--blue': isBlue }]} id="navbar">
-  <a class="nav-logo" href="/" aria-label="Arnav's Archive, home">
+  <a class="nav-logo" href="/" aria-label="Arnav's Portfolio, home">
     <Image src={isBlue ? white : blue} alt="" width={320} densities={[1, 2]} loading="eager" />
   </a>
   <nav class="nav-links" aria-label="Main">

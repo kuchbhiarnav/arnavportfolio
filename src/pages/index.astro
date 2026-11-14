@@ -19,13 +19,14 @@ const work = (await getCollection('work', (w) => show(w.data))).sort((a, b) => a
 const featured = ['ad-hoc-analysis-consumer-goods', 'telangana-tourism-dashboard'].map((id) => ({ p: work.find((w) => w.id === id)!, n: work.findIndex((w) => w.id === id) + 1 })).filter((f) => f.p);
 
 const person = {
-  '@context': 'https://schema.org', '@type': 'Person', name: site.name, description: site.description,
+  '@context': 'https://schema.org', '@type': 'Person', name: site.name, jobTitle: 'Product strategy and data analytics', description: site.description,
   url: Astro.site?.href, sameAs: Object.values(site.links),
   alumniOf: [{ '@type': 'CollegeOrUniversity', name: 'Chandigarh University' }, { '@type': 'CollegeOrUniversity', name: 'Vrije Universiteit Brussel' }],
   knowsAbout: ['Climate-risk analytics', 'Environmental data engineering', 'Decision-support systems', 'Parametric insurance'],
 };
+const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: site.title, url: Astro.site?.href, author: { '@type': 'Person', name: site.name } };
 ---
-<Base path="/" jsonLd={person}>
+<Base path="/" jsonLd={[person, website]}>
   <section class="hero" aria-label="Introduction">
     <div class="hero-inner">
       <h1 class="hero-heading">

@@ -4,9 +4,9 @@ import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 
-// Canonical origin, e.g. https://example.com. Unset => no canonical/OG absolute URLs and no sitemap
-// (see docs/05-setup-and-environment.md). Never guess a domain.
-const site = process.env.SITE_URL || undefined;
+// Canonical origin. SITE_URL overrides it (for previews); the live domain is the default so canonical URLs, social previews
+// and the sitemap are always present.
+const site = process.env.SITE_URL || 'https://arnavpatnaik.in';
 
 export default defineConfig({
   site,

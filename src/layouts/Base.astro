@@ -4,6 +4,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ConsentBanner from '../components/ConsentBanner.astro';
 import { site } from '../data/site';
+import { seo } from '../data/seo';
 
 interface Props {
   title?: string;
@@ -16,8 +17,9 @@ interface Props {
   /** Blue navigation bar (About, Work) or the white one (everywhere else), as on the original site. */
   blueNav?: boolean;
 }
-const { title, description = site.description, path, ogType = 'website', jsonLd, noindex = false, blueNav = false } = Astro.props;
-const fullTitle = title ? `${title} · ${site.title}` : site.title;
+const { title, description: descProp, path, ogType = 'website', jsonLd, noindex = false, blueNav = false } = Astro.props;
+const description = seo[path]?.description ?? descProp ?? site.description;
+const fullTitle = seo[path]?.title ?? (title ? `${title} | ${site.title}` : site.title);
 // Absolute URLs only exist when a real origin is configured (SITE_URL). We never guess a domain.
 const abs = (p: string) => (Astro.site ? new URL(p, Astro.site).href : undefined);
 const canonical = abs(path === '/' ? '/' : path);
@@ -32,7 +34,7 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical} />}
-    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="robots" content={noindex ? 'noindex' : 'index, follow'} />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
