@@ -1,7 +1,7 @@
 /** Single source for identity, contact and link facts. Public-safe values only. */
 export const site = {
   name: 'Arnav Patnaik',
-  title: "Arnav's Portfolio",
+  title: "Arnav Patnaik's Portfolio",
   description:
     "Hi, I'm Arnav Patnaik, a data analyst exploring how data, technology, and sustainability come together to shape decisions, systems, and real-world impact.",
   tagline: 'I turn complex environmental and business data into decisions, products, and stories people can use.',

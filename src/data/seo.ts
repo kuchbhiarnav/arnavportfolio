@@ -1,7 +1,7 @@
 /** Search-result titles (and, where given, descriptions) per route. Anything not listed falls back to "<page title> | Arnav's Portfolio". */
 export const seo: Record<string, { title: string; description?: string }> = {
   '/': {
-    title: 'Arnav Patnaik | Product Strategy, Data & Analytics',
+    title: "Arnav Patnaik's Portfolio | Product Strategy, Data & Analytics",
     description: 'Arnav Patnaik is a product strategy and business analytics professional working across climate-tech, insurtech, data analytics and research. Explore projects in parametric insurance, SQL, Power BI, climate intelligence and data-driven decision-making.',
   },
   '/about': { title: 'About Arnav Patnaik | Experience & Education' },

@@ -24,7 +24,7 @@ const person = {
   alumniOf: [{ '@type': 'CollegeOrUniversity', name: 'Chandigarh University' }, { '@type': 'CollegeOrUniversity', name: 'Vrije Universiteit Brussel' }],
   knowsAbout: ['Climate-risk analytics', 'Environmental data engineering', 'Decision-support systems', 'Parametric insurance'],
 };
-const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: site.title, url: Astro.site?.href, author: { '@type': 'Person', name: site.name } };
+const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: site.title, alternateName: ['Arnav Patnaik', 'arnavpatnaik.in'], url: Astro.site?.href, author: { '@type': 'Person', name: site.name } };
 ---
 <Base path="/" jsonLd={[person, website]}>
   <section class="hero" aria-label="Introduction">
